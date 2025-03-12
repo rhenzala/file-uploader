@@ -5,11 +5,9 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 const path = require('path');
-const { createClient } = require('@supabase/supabase-js');
+const supabase = require('./supabase-client')
 const prisma = require('./prisma');
 const PORT = process.env.PORT || 3000;
-
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const app = express();
 
 app.set('view engine', 'ejs');
