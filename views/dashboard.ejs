@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PicoDrive</title>
+</head>
+<body>
+  <header>
+    <div class="logo"></div>
+    <nav>
+      <form action="/logout" method="GET" style="margin-bottom: 20px;">
+        <button type="submit">Logout</button>
+      </form>
+    </nav>
+  </header>
+  <h1>Welcome, <%= user.username %></h1>
+  <h2>Folders</h2>
+  <ul>
+    <% folders.forEach(folder => { %>
+      <li>
+        <a href="/files/<%= folder.id %>"><%= folder.name %></a>
+        <form action="/folders/delete/<%= folder.id %>" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+
+  <h2>Files</h2>
+  <ul>
+    <% files.forEach(file => { %>
+      <li>
+        <a href="/uploads/<%= file.path %>" download><%= file.name %></a> 
+        (<%= (file.size / 1024).toFixed(2) %> KB)
+        <form action="/files/delete/<%= file.id %>" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+
+  <h3>Create New Folder</h3>
+  <form action="/folders/create" method="POST">
+    <input type="hidden" name="folderId" value="<%= folderId %>">
+    <input type="text" name="name" placeholder="Folder Name" required>
+    <button type="submit">Create Folder</button>
+  </form>
+
+  <h3>Upload File</h3>
+  <form action="/files/upload" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="folderId" value="<%= folderId %>">
+    <input type="file" name="file" required>
+    <button type="submit">Upload</button>
+  </form>
+</body>
+</html>
