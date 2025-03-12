@@ -7,11 +7,13 @@ const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const path = require('path');
 const multer = require('multer');
-const fs = require('fs'); // Import fs to handle file system
+const fs = require('fs'); 
 const PORT = process.env.PORT || 3000;
 
 const prisma = new PrismaClient();
 const app = express();
+const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
+
 
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -35,6 +37,14 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  cookie: { maxAge: 1000 * 60 * 60 * 24 }, 
+  store: new PrismaSessionStore(
+    prisma,
+    {
+      checkPeriod: 2 * 60 * 1000, 
+      dbRecordIdIsSessionId: true
+    }
+  )
 }));
 app.use(passport.initialize());
 app.use(passport.session());
