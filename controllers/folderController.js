@@ -1,3 +1,5 @@
+const prisma = require('../prisma');
+
 exports.createFolder = async (req, res) => {
   await prisma.folder.create({
     data: {

@@ -1,4 +1,6 @@
 const { getPublicUrl } = require('../utils/helper');
+const prisma = require('../prisma');
+const supabase = require('../supabase-client');
 
 exports.listFiles = async (req, res) => {
   const folderId = req.params.folderId ? parseInt(req.params.folderId) : null;
@@ -20,27 +22,46 @@ exports.listFiles = async (req, res) => {
 };
 
 exports.uploadFile = async (req, res) => {
-  const fileName = `${Date.now()}-${req.file.originalname}`;
-  const { error } = await supabase.storage.from('files').upload(fileName, req.file.buffer, {
-    contentType: req.file.mimetype,
-  });
+  try {
+    if (!req.file) {
+      console.error('No file uploaded.');
+      return res.status(400).send('No file uploaded.');
+    }
 
-  if (error) {
-    console.error(error);
-    return res.status(500).send('File upload failed.');
+    const fileName = `${Date.now()}-${req.file.originalname}`;
+    const publicUrl = getPublicUrl(supabase, fileName);
+
+    // Convert buffer to Blob (Supabase expects Blob, File, or ReadableStream)
+    const fileBlob = new Blob([req.file.buffer], { type: req.file.mimetype });
+
+    const { data, error } = await supabase.storage
+      .from('files') 
+      .upload(fileName, fileBlob, {
+        contentType: req.file.mimetype,
+        upsert: false, 
+      });
+
+    if (error) {
+      console.error('Supabase upload error:', error);
+      return res.status(500).send('File upload failed.');
+    }
+
+    await prisma.file.create({
+      data: {
+        name: req.file.originalname,
+        path: fileName,
+        size: req.file.size,
+        userId: req.user.id,
+        folderId: req.body.folderId ? parseInt(req.body.folderId) : null,
+        publicUrl: publicUrl,
+      },
+    });
+
+    res.redirect('back');
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).send('Internal server error.');
   }
-
-  await prisma.file.create({
-    data: {
-      name: req.file.originalname,
-      path: fileName,
-      size: req.file.size,
-      userId: req.user.id,
-      folderId: req.body.folderId ? parseInt(req.body.folderId) : null,
-    },
-  });
-
-  res.redirect('back');
 };
 
 exports.deleteFile = async (req, res) => {
