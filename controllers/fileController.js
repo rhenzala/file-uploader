@@ -8,6 +8,19 @@ exports.listFiles = async (req, res) => {
   res.render('dashboard', { files, folders, folderId, user: req.user });
 };
 
+exports.viewFile = async (req, res) => {
+  const fileId = parseInt(req.params.id);
+  const file = await prisma.file.findUnique({
+    where: { id: fileId, userId: req.user.id } 
+  });
+
+  if (!file) {
+    return res.status(404).send('File not found or access denied.');
+  }
+
+  res.render('fileDetails', { file, user: req.user });
+};
+
 exports.uploadFile = async (req, res) => {
   await prisma.file.create({
     data: {

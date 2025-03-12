@@ -18,7 +18,7 @@ const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
-  console.log('✅ uploads directory created!');
+  console.log('uploads directory created!');
 }
 
 const storage = multer.diskStorage({

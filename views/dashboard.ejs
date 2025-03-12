@@ -33,12 +33,14 @@
       <li>
         <a href="/uploads/<%= file.path %>" download><%= file.name %></a> 
         (<%= (file.size / 1024).toFixed(2) %> KB)
+        <a href="/files/view/<%= file.id %>">[Details]</a> 
         <form action="/files/delete/<%= file.id %>" method="POST" style="display:inline;">
           <button type="submit">Delete</button>
         </form>
       </li>
     <% }) %>
   </ul>
+  
 
   <h3>Create New Folder</h3>
   <form action="/folders/create" method="POST">
