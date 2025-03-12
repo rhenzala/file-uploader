@@ -40,6 +40,7 @@ model File {
   id         Int      @id @default(autoincrement())
   name       String
   path       String
+  publicUrl  String   
   size       Int
   uploadedAt DateTime @default(now())
   folderId   Int?
@@ -47,6 +48,7 @@ model File {
   userId     Int
   user       User     @relation(fields: [userId], references: [id])
 }
+
 model Session {
   id           String   @id @default(cuid())
   sid          String   @unique
