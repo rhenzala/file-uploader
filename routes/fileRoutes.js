@@ -1,8 +1,10 @@
 const express = require('express');
-const { uploadFile, listFiles } = require('../controllers/fileController');
-const router = express.Router();
+const { listFiles, uploadFile, deleteFile } = require('../controllers/fileController');
 
-router.get('/', listFiles);
-router.post('/upload', uploadFile); 
-
-module.exports = router;
+module.exports = (upload, isAuthenticated) => {
+  const router = express.Router();
+  router.get('/:folderId?', isAuthenticated, listFiles);
+  router.post('/upload', isAuthenticated, upload.single('file'), uploadFile);
+  router.post('/delete/:id', isAuthenticated, deleteFile);
+  return router;
+};

@@ -14,30 +14,34 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
-  files     File[]
-  folders   Folder[]
-}
-
-model File {
-  id          Int      @id @default(autoincrement())
-  name        String
-  path        String
-  size        Int
-  uploadedAt  DateTime @default(now())
-  folderId    Int?
-  folder      Folder?  @relation(fields: [folderId], references: [id])
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  password String
+  files    File[]
+  folders  Folder[]
 }
 
 model Folder {
-  id       Int    @id @default(autoincrement())
-  name     String
-  userId   Int
-  user     User  @relation(fields: [userId], references: [id])
-  files    File[]
+  id             Int       @id @default(autoincrement())
+  name           String
+  userId         Int
+  user           User      @relation(fields: [userId], references: [id])
+  files          File[]
+  
+  parentFolderId Int?     
+  parentFolder   Folder?  @relation("FolderHierarchy", fields: [parentFolderId], references: [id])  
+  children       Folder[] @relation("FolderHierarchy")  
 }
 
+
+model File {
+  id         Int      @id @default(autoincrement())
+  name       String
+  path       String
+  size       Int
+  uploadedAt DateTime @default(now())
+  folderId   Int?
+  folder     Folder?  @relation(fields: [folderId], references: [id])
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+}

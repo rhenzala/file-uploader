@@ -1,8 +1,9 @@
 const express = require('express');
-const { createFolder, listFolders } = require('../controllers/folderController');
-const router = express.Router();
+const { listFolders, createFolder, deleteFolder } = require('../controllers/folderController');
 
-router.get('/', listFolders);
-router.post('/create', createFolder);
-
-module.exports = router;
+module.exports = (isAuthenticated) => {
+  const router = express.Router();
+  router.post('/create', isAuthenticated, createFolder);
+  router.post('/delete/:id', isAuthenticated, deleteFolder);
+  return router;
+};
