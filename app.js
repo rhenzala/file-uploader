@@ -7,10 +7,17 @@ const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const path = require('path');
 const multer = require('multer');
+const fs = require('fs'); // Import fs to handle file system
 const PORT = process.env.PORT || 3000;
 
 const prisma = new PrismaClient();
 const app = express();
+
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+  console.log('✅ uploads directory created!');
+}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
