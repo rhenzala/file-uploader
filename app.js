@@ -4,59 +4,50 @@ const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
-const { PrismaClient } = require('@prisma/client');
 const path = require('path');
-const multer = require('multer');
-const fs = require('fs'); 
+const { createClient } = require('@supabase/supabase-js');
+const prisma = require('./prisma');
 const PORT = process.env.PORT || 3000;
 
-const prisma = new PrismaClient();
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const app = express();
-const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
-
-
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-  console.log('uploads directory created!');
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
-});
-const upload = multer({ storage });
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static('uploads'));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 60 * 24 }, 
-  store: new PrismaSessionStore(
-    prisma,
-    {
-      checkPeriod: 2 * 60 * 1000, 
-      dbRecordIdIsSessionId: true
-    }
-  )
+  cookie: { maxAge: 1000 * 60 * 60 * 24 },
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(new LocalStrategy(async (username, password, done) => {
-  const user = await prisma.user.findUnique({ where: { username } });
-  if (!user) return done(null, false);
-  const isMatch = await bcrypt.compare(password, user.password);
-  return isMatch ? done(null, user) : done(null, false);
+  try {
+    const user = await prisma.user.findUnique({ where: { username } });
+    if (!user) return done(null, false);
+    const isMatch = await bcrypt.compare(password, user.password);
+    return isMatch ? done(null, user) : done(null, false);
+  } catch (error) {
+    return done(error);
+  }
 }));
+
 passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser(async (id, done) => done(null, await prisma.user.findUnique({ where: { id } })));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id } });
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
+});
+
 
 const isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) return next();
@@ -64,11 +55,12 @@ const isAuthenticated = (req, res, next) => {
 };
 
 const authRoutes = require('./routes/authRoutes');
-const fileRoutes = require('./routes/fileRoutes')(upload, isAuthenticated);
+const fileRoutes = require('./routes/fileRoutes')(isAuthenticated);
 const folderRoutes = require('./routes/folderRoutes')(isAuthenticated);
 
-app.use('/', authRoutes);
+app.use('/', authRoutes(supabase));
 app.use('/files', fileRoutes);
 app.use('/folders', folderRoutes);
+
 
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

@@ -7,15 +7,11 @@
 </head>
 <body>
     <h1>File Details</h1>
-  <p><strong>Filename:</strong> <%= file.name %></p>
-  <p><strong>Size:</strong> <%= (file.size / 1024).toFixed(2) %> KB</p>
-  <p><strong>Uploaded At:</strong> <%= file.uploadedAt.toLocaleString() %></p>
-  
-  <a href="/uploads/<%= file.path %>" download>
-    <button>Download</button>
-  </a>
+<p>Name: <%= file.name %></p>
+<p>Size: <%= (file.size / 1024).toFixed(2) %> KB</p>
+<p>Uploaded on: <%= new Date(file.created_at).toLocaleString() %></p>
+<p><a href="<%= publicUrl %>" target="_blank">Download / View File</a></p>
+<a href="/files/<%= file.folderId %>">Back to Folder</a>
 
-  <br><br>
-  <a href="/files/<%= file.folderId || '' %>">Back to Folder</a>
 </body>
 </html>

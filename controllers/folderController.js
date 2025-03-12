@@ -1,13 +1,10 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
 exports.createFolder = async (req, res) => {
   await prisma.folder.create({
     data: {
       name: req.body.name,
       userId: req.user.id,
-      parentFolderId: req.body.folderId ? parseInt(req.body.folderId) : null
-    }
+      parentFolderId: req.body.folderId ? parseInt(req.body.folderId) : null,
+    },
   });
   res.redirect('back');
 };
