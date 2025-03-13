@@ -3,15 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= file.name %></title>
 </head>
 <body>
-    <h1>File Details</h1>
-<p>Name: <%= file.name %></p>
-<p>Size: <%= (file.size / 1024).toFixed(2) %> KB</p>
-<p>Uploaded on: <%= new Date(file.created_at).toLocaleString() %></p>
-<p><a href="<%= publicUrl %>" target="_blank">Download / View File</a></p>
-<a href="/files/<%= file.folderId %>">Back to Folder</a>
+    <header>
+        <div class="logo">PicoDrive</div>
+        <nav>
+          <div class="toggle-container">
+            <label class="toggle-switch">
+              <input type="checkbox" id="theme-toggle">
+              <span class="toggle-slider">
+                <span class="toggle-icon sun-icon">☀️</span>
+                <span class="toggle-icon moon-icon">🌙</span>
+              </span>
+            </label>
+          </div>
+          <form action="/logout" method="GET">
+            <button type="submit">Logout</button>
+          </form>
+        </nav>
+      </header>
+    <main class="main-center">
+        <a href="/files/<%= file.folderId %>" class="details-button">Back</a>
+        <section>
+            <h1>File Details</h1>
+            <p><span>Name:</span> <%= file.name %></p>
+            <p><span>Size:</span> <%= (file.size / 1024).toFixed(2) %> KB</p>
+            <p><span>Uploaded on:</span> <%= new Date(file.uploadedAt).toLocaleString() %></p>
+            <p>
+                <a href="<%= publicUrl %>" target="_blank" class="details-button">View File</a>
+                <a href="<%= publicUrl %>" download class="details-button">Download File</a>
+            </p>
+        </section>
+    </main>
+    <script>
+        function setTheme(themeName) {
+        localStorage.setItem('theme', themeName);
+        document.documentElement.setAttribute('data-theme', themeName);
 
+        const toggle = document.getElementById('theme-toggle');
+        toggle.checked = themeName === 'dark';
+        }
+        function toggleTheme() {
+        if (localStorage.getItem('theme') === 'dark') {
+            setTheme('light');
+        } else {
+            setTheme('dark');
+        }
+        }
+        (function() {
+        const savedTheme = localStorage.getItem('theme');
+        
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            if (prefersDarkScheme.matches) {
+            setTheme('dark');
+            } else {
+            setTheme('light');
+            }
+        }
+        
+        document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
+        })();
+
+    </script>
 </body>
 </html>

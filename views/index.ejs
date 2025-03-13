@@ -3,10 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pico Drive</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <title>PicoDrive</title>
 </head>
 <body>
-  <h1>Pico Drive</h1>
-  <%- include('login') %>
+  <header>
+    <div class="logo">PicoDrive</div>
+    <nav>
+      <div class="toggle-container home-toggle">
+        <label class="toggle-switch">
+          <input type="checkbox" id="theme-toggle">
+          <span class="toggle-slider">
+            <span class="toggle-icon sun-icon">☀️</span>
+            <span class="toggle-icon moon-icon">🌙</span>
+          </span>
+        </label>
+      </div>
+    </nav>
+  </header>
+  <main class="main-center">
+    <h1>Welcome to PicoDrive</h1>
+    <div id="auth-form-container">
+      <%- include('login') %>
+    </div>
+  </main>
+  <script>
+    function setTheme(themeName) {
+      localStorage.setItem('theme', themeName);
+      document.documentElement.setAttribute('data-theme', themeName);
+
+      const toggle = document.getElementById('theme-toggle');
+      toggle.checked = themeName === 'dark';
+    }
+    function toggleTheme() {
+      if (localStorage.getItem('theme') === 'dark') {
+        setTheme('light');
+      } else {
+        setTheme('dark');
+      }
+    }
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      
+      if (savedTheme) {
+        setTheme(savedTheme);
+      } else {
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        if (prefersDarkScheme.matches) {
+          setTheme('dark');
+        } else {
+          setTheme('light');
+        }
+      }
+      
+      document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
+    })();
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const authContainer = document.getElementById('auth-form-container');
+     
+      authContainer.addEventListener('click', async function(e) {
+        if (e.target.tagName === 'A') {
+          e.preventDefault();
+          const href = e.target.getAttribute('href');
+          
+          if (href === '/login' || href === '/register') {
+            try {
+              const response = await fetch(`${href}Partial`);
+              if (!response.ok) throw new Error('Failed to load form');
+              
+              const html = await response.text();
+              authContainer.innerHTML = html;
+              
+              // Update URL without page reload
+              history.pushState({page: href.substring(1)}, '', href);
+            } catch (error) {
+              console.error('Error loading form:', error);
+            }
+          }
+        }
+      });
+      window.addEventListener('popstate', async function(event) {
+        if (event.state && event.state.page) {
+          try {
+            const page = event.state.page;
+            const response = await fetch(`/${page}Partial`);
+            if (!response.ok) throw new Error('Failed to load form');
+            
+            const html = await response.text();
+            authContainer.innerHTML = html;
+          } catch (error) {
+            console.error('Error loading form:', error);
+          }
+        }
+      });
+    
+      const currentPage = window.location.pathname.replace('/', '') || 'login';
+      history.replaceState({page: currentPage}, '', window.location.pathname);
+    });
+  </script>
 </body>
 </html>

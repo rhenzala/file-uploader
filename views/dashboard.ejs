@@ -3,58 +3,251 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
   <title>PicoDrive</title>
 </head>
 <body>
   <header>
-    <div class="logo"></div>
+    <div class="logo">PicoDrive</div>
     <nav>
-      <form action="/logout" method="GET" style="margin-bottom: 20px;">
+      <div class="toggle-container">
+        <label class="toggle-switch">
+          <input type="checkbox" id="theme-toggle">
+          <span class="toggle-slider">
+            <span class="toggle-icon sun-icon">☀️</span>
+            <span class="toggle-icon moon-icon">🌙</span>
+          </span>
+        </label>
+      </div>
+      <form action="/logout" method="GET">
         <button type="submit">Logout</button>
       </form>
     </nav>
   </header>
-  <h1>Welcome, <%= user.username %></h1>
-  <h2>Folders</h2>
-  <ul>
-    <% folders.forEach(folder => { %>
-      <li>
-        <a href="/files/<%= folder.id %>"><%= folder.name %></a>
-        <form action="/folders/delete/<%= folder.id %>" method="POST" style="display:inline;">
-          <button type="submit">Delete</button>
+  <main>
+    <h1 class="greetings">Welcome, <%= user.username %></h1>
+    <div class="flex-container">
+      <aside>
+        <div class="popup-wrapper">
+          <button id="new-btn" class="new-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>New</span>
+          </button>
+        
+          <div id="popup-menu" class="popup">
+            <button id="open-upload-modal" class="popup-item">File Upload</button>
+            <button id="open-folder-modal" class="popup-item">New Folder</button>
+          </div>
+        </div>
+        
+        <button id="filesBtn" class="aside-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          <span>Files</span>
+        </button>
+        <button id="foldersBtn" class="aside-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>Folders</span>
+        </button>
+      </aside>
+      <div class="contents card">
+        <section id="fileList" class="file-list">
+          <h2>Files</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>File Size</th>
+                <th>Details</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% files.forEach(file => { %>
+                <tr>
+                  <td>
+                    <a href="https://cflgyxyggkhodkssgsuq.supabase.co/storage/v1/object/public/files/<%= file.path %>" target="_blank"><%= file.name %></a>
+                  </td>
+                  <td>
+                    <%= (file.size / 1024).toFixed(2) %> KB
+                  </td>
+                  <td>
+                    <a href="/files/view/<%= file.id %>">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1" />
+                        <circle cx="19" cy="12" r="1" />
+                        <circle cx="5" cy="12" r="1" />
+                      </svg>
+                    </a>
+                  </td>
+                  <td>
+                    <form action="/files/delete/<%= file.id %>" method="POST" style="display:inline;">
+                      <button type="submit" class="action-delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </section>
+      
+        <section id="folderList" class="folder-list">
+          <h2>Folders</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% folders.forEach(folder => { %>
+                <tr>
+                  <td>
+                    <a href="/files/<%= folder.id %>"><%= folder.name %></a>
+                  </td>
+                  <td>
+                    <form action="/folders/delete/<%= folder.id %>" method="POST" style="display:inline;">
+                      <button type="submit" class="action-delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </div>
+
+    <div id="folder-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" data-target="folder-modal">&times;</span>
+        <h3>Create New Folder</h3>
+        <form action="/folders/create" method="POST">
+          <input type="hidden" name="folderId" value="<%= folderId %>">
+          <input type="text" name="name" placeholder="Folder Name" required>
+          <button type="submit">Create</button>
         </form>
-      </li>
-    <% }) %>
-  </ul>
+      </div>
+    </div>
 
-  <h2>Files</h2>
-<ul>
-  <% files.forEach(file => { %>
-    <li>
-      <a href="https://cflgyxyggkhodkssgsuq.supabase.co/storage/v1/object/public/files/<%= file.path %>" target="_blank"><%= file.name %></a>
-      (<%= (file.size / 1024).toFixed(2) %> KB)
-      <a href="/files/view/<%= file.id %>">[Details]</a> 
-      <form action="/files/delete/<%= file.id %>" method="POST" style="display:inline;">
-        <button type="submit">Delete</button>
-      </form>
-    </li>
-  <% }) %>
-</ul>
+    <div id="upload-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" data-target="upload-modal">&times;</span>
+        <h3>Upload File</h3>
+        <form action="/files/upload" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="folderId" value="<%= folderId %>">
+          <input type="file" name="file" required>
+          <button type="submit">Upload</button>
+        </form>
+      </div>
+    </div>
 
-  
+  </main>
+  <script>
+    function setTheme(themeName) {
+      localStorage.setItem('theme', themeName);
+      document.documentElement.setAttribute('data-theme', themeName);
 
-  <h3>Create New Folder</h3>
-  <form action="/folders/create" method="POST">
-    <input type="hidden" name="folderId" value="<%= folderId %>">
-    <input type="text" name="name" placeholder="Folder Name" required>
-    <button type="submit">Create Folder</button>
-  </form>
+      const toggle = document.getElementById('theme-toggle');
+      toggle.checked = themeName === 'dark';
+    }
+    function toggleTheme() {
+      if (localStorage.getItem('theme') === 'dark') {
+        setTheme('light');
+      } else {
+        setTheme('dark');
+      }
+    }
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      
+      if (savedTheme) {
+        setTheme(savedTheme);
+      } else {
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        if (prefersDarkScheme.matches) {
+          setTheme('dark');
+        } else {
+          setTheme('light');
+        }
+      }
+      
+      document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
+    })();
 
-  <h3>Upload File</h3>
-  <form action="/files/upload" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="folderId" value="<%= folderId %>">
-    <input type="file" name="file" required>
-    <button type="submit">Upload</button>
-  </form>
+
+    const newBtn = document.getElementById('new-btn');
+    const popupMenu = document.getElementById('popup-menu');
+    const openUploadModalBtn = document.getElementById('open-upload-modal');
+    const openFolderModalBtn = document.getElementById('open-folder-modal');
+    const folderModal = document.getElementById('folder-modal');
+    const uploadModal = document.getElementById('upload-modal');
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+
+    // Toggle popup menu
+    newBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); 
+      popupMenu.style.display = popupMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    openUploadModalBtn.addEventListener('click', () => {
+      uploadModal.style.display = 'block';
+      popupMenu.style.display = 'none'; 
+    });
+
+    openFolderModalBtn.addEventListener('click', () => {
+      folderModal.style.display = 'block';
+      popupMenu.style.display = 'none'; 
+    });
+
+    closeModalButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.target.dataset.target;
+        document.getElementById(target).style.display = 'none';
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.popup-wrapper')) {
+        popupMenu.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === folderModal) folderModal.style.display = 'none';
+      if (e.target === uploadModal) uploadModal.style.display = 'none';
+    });
+    // Toggle buttons
+    const filesBtn = document.getElementById('filesBtn');
+    const foldersBtn = document.getElementById('foldersBtn');
+
+    const fileList = document.getElementById('fileList');
+    const folderList = document.getElementById('folderList');
+
+    fileList.style.display = 'block';
+    folderList.style.display = 'none';
+
+    filesBtn.addEventListener('click', () => {
+      fileList.style.display = 'block';
+      folderList.style.display = 'none';
+    });
+
+    foldersBtn.addEventListener('click', () => {
+      fileList.style.display = 'none';
+      folderList.style.display = 'block';
+    });
+
+  </script>
 </body>
 </html>
