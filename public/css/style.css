@@ -391,6 +391,26 @@ tbody tr:hover td {
   border: none;
 }
 
+.details-section {
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.details-section h1 {
+  margin-bottom: 1.5rem;
+}
+
+.details-button {
+  border: 1px solid var(--blue);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+.details-button:hover {
+  border: 1px solid var(--rose);;
+}
 
 
 @media (max-width: 768px) {

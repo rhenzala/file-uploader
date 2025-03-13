@@ -25,8 +25,8 @@
         </nav>
       </header>
     <main class="main-center">
-        <a href="/files/<%= file.folderId %>" class="details-button">Back</a>
-        <section>
+        <section class="details-section">
+            <a href="/files/<%= file.folderId %>">Back</a>
             <h1>File Details</h1>
             <p><span>Name:</span> <%= file.name %></p>
             <p><span>Size:</span> <%= (file.size / 1024).toFixed(2) %> KB</p>
