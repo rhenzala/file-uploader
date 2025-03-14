@@ -60,9 +60,8 @@ main {
 }
 main {
     flex: 1;
-    overflow-y: auto;
     padding-block: 1rem;
-
+    overflow-y: auto;
 }
 nav {
   display: flex;
@@ -77,6 +76,7 @@ nav {
     width: 80%;
     padding: 1rem;
     border-radius: 1rem;
+    flex-shrink: 0;
 }
 aside {
     width: 20%;
@@ -278,10 +278,14 @@ input {
 }
 .new-button:hover,
 .aside-button:hover,
-.popup-item:hover {
+.popup-item:hover,
+.aside-button:active {
   background-color: var(--hover-background);
   color: var(--text-color);
   border: none;
+}
+.aside-button svg {
+  flex-shrink: 0;
 }
 .greetings {
   margin-bottom: 1.5rem;
@@ -356,12 +360,13 @@ input {
 }
 
 table {
-  width: 100%;
   border-collapse: collapse;
   font-family: var(--font-sans);
   background-color: var(--card-background);
   color: var(--text-color);
   margin-top: 1.5rem;
+  min-width: 100%;
+  white-space: nowrap;
 }
 
 thead {
@@ -412,25 +417,25 @@ tbody tr:hover td {
   border: 1px solid var(--rose);;
 }
 
+.file-list, .folder-list {
+  overflow-x: auto;
+  width: 100%;
+}
+
 
 @media (max-width: 768px) {
-    header, main {
-        padding-inline: 5%;
-    }
-    .container {
-        flex-direction: column;
-    }
-    .main-left {
-        display: flex;
-        justify-content: space-around;
-    }
+  header, main {
+    padding: 5%;
+  }
+  
+  .new-button span,
+  .aside-button span {
+    display: none;
+  }
+
 }
 @media (max-width: 512px) {
     header, main {
         padding-inline: 1rem;
-    }
-    .main-left {
-        align-self: center;
-        flex-direction: column;
     }
 }
