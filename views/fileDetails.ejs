@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/icons/folder.svg" />
     <title><%= file.name %></title>
 </head>
 <body>
@@ -32,12 +33,13 @@
             <p><span>Size:</span> <%= (file.size / 1024).toFixed(2) %> KB</p>
             <p><span>Uploaded on:</span> <%= new Date(file.uploadedAt).toLocaleString() %></p>
             <p>
-                <a href="<%= publicUrl %>" target="_blank" class="details-button">View File</a>
-                <a href="<%= publicUrl %>" download class="details-button">Download File</a>
+                <a href="<%= viewUrl %>" target="_blank" class="details-button">View File</a>
+                <a href="<%= downloadUrl %>" class="details-button">Download File</a>
             </p>
         </section>
     </main>
     <script>
+        // Theme toggle code remains the same
         function setTheme(themeName) {
         localStorage.setItem('theme', themeName);
         document.documentElement.setAttribute('data-theme', themeName);
@@ -69,7 +71,6 @@
         
         document.getElementById('theme-toggle').addEventListener('change', toggleTheme);
         })();
-
     </script>
 </body>
 </html>

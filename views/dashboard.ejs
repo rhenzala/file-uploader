@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/icons/folder.svg" />
   <title>PicoDrive</title>
 </head>
 <body>
@@ -65,7 +66,7 @@
               <% files.forEach(file => { %>
                 <tr>
                   <td>
-                    <a href="https://cflgyxyggkhodkssgsuq.supabase.co/storage/v1/object/public/files/<%= file.path %>" target="_blank"><%= file.name %></a>
+                    <a href="<%= file.viewUrl %>" target="_blank"><%= file.name %></a>
                   </td>
                   <td>
                     <%= (file.size / 1024).toFixed(2) %> KB
